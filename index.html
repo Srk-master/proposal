@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            z-index: 10;
+        }
+
+        .question {
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 3rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            line-height: 1.5;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            position: relative;
+        }
+
+        .btn-yes {
+            padding: 1rem 3rem;
+            font-size: 1.4rem;
+            border: none;
+            border-radius: 50px;
+            background: #ff6b6b;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-yes:active {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .btn-no {
+            padding: 1rem 3rem;
+            font-size: 1.4rem;
+            border: none;
+            border-radius: 50px;
+            background: #868e96;
+            color: white;
+            cursor: pointer;
+            position: absolute;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .celebration {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #ff9a9e 100%);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .celebration.show {
+            display: flex;
+        }
+
+        .celebration-text {
+            font-size: 2rem;
+            color: #e74c3c;
+            text-align: center;
+            line-height: 2;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .heart {
+            position: fixed;
+            font-size: 1.5rem;
+            animation: float-up 3s ease-out forwards;
+            pointer-events: none;
+            z-index: 101;
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) scale(0.5);
+            }
+        }
+
+        .taunt {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            min-height: 1.5rem;
+            transition: opacity 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="question">나랑 결혼해줄래?</div>
+        <div class="buttons">
+            <button class="btn-yes" onclick="sayYes()">예</button>
+            <button class="btn-no" id="btnNo">아니오</button>
+        </div>
+        <div class="taunt" id="taunt"></div>
+    </div>
+
+    <div class="celebration" id="celebration">
+        <div class="celebration-text">
+            사랑해 ❤️<br>
+            영원히 함께하자
+        </div>
+    </div>
+
+    <script>
+        const btnNo = document.getElementById('btnNo');
+        const taunt = document.getElementById('taunt');
+        const taunts = [
+            '못 누르지~',
+            'ㅋㅋㅋ',
+            '여기야 여기~',
+            '너무 느려~',
+            '포기해~',
+            '그냥 예 눌러~',
+            '안 잡힌다~',
+            '헤헤',
+            '이리 와봐~',
+            '솔직히 예 누르고 싶지?'
+        ];
+        let attempts = 0;
+
+        function getRandomPosition() {
+            const padding = 20;
+            const btnWidth = btnNo.offsetWidth;
+            const btnHeight = btnNo.offsetHeight;
+            const maxX = window.innerWidth - btnWidth - padding;
+            const maxY = window.innerHeight - btnHeight - padding;
+            const x = Math.random() * (maxX - padding) + padding;
+            const y = Math.random() * (maxY - padding) + padding;
+            return { x, y };
+        }
+
+        function runAway() {
+            attempts++;
+            const pos = getRandomPosition();
+            btnNo.style.position = 'fixed';
+            btnNo.style.left = pos.x + 'px';
+            btnNo.style.top = pos.y + 'px';
+            taunt.textContent = taunts[Math.floor(Math.random() * taunts.length)];
+        }
+
+        // 모바일: 터치 시작 시 도망
+        btnNo.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            runAway();
+        });
+
+        // PC: 마우스 오버 시 도망
+        btnNo.addEventListener('mouseenter', function() {
+            runAway();
+        });
+
+        function sayYes() {
+            document.getElementById('celebration').classList.add('show');
+            spawnHearts();
+        }
+
+        function spawnHearts() {
+            const hearts = ['❤️', '💕', '💖', '💗', '💓', '💘'];
+            let count = 0;
+            const interval = setInterval(() => {
+                if (count > 50) {
+                    clearInterval(interval);
+                    return;
+                }
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.top = '100vh';
+                document.body.appendChild(heart);
+                count++;
+            }, 100);
+        }
+    </script>
+</body>
+</html>
